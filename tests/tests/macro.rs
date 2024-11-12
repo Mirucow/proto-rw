@@ -77,11 +77,9 @@ fn derive() {
 
     let mut buf = Vec::new();
     buf.write_proto(&example).unwrap();
-    println!("{:?}", buf);
 
     let mut cursor = std::io::Cursor::new(&buf);
     let read_example = cursor.read_proto::<ExampleStruct>().unwrap();
-    println!("{:?}", cursor.get_ref());
 
     assert_eq!(example, read_example);
 }
