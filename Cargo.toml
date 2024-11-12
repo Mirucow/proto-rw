@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "proto-rw",
+    "macros",
+    "tests",
+]
+resolver = "2"
