@@ -56,7 +56,7 @@ impl From<bool> for ExampleConvert {
 }
 
 #[test]
-fn derive() {
+fn macros() {
     let example = ExampleStruct {
         a: 42,
         b: "hello".to_string(),

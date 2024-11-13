@@ -38,7 +38,7 @@ struct ExampleStruct {
     f: (u8, String),
 }
 
-fn derive() {
+fn main() {
     let example = ExampleStruct {
         a: 42,
         b: "hello".to_string(),
