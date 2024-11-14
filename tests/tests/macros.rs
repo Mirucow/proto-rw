@@ -22,13 +22,14 @@ struct ExampleStruct {
     j: (LE<i32>, bool),
     #[length(Var<u32>)]
     k: (Vec<u8>, BE<u16>),
-    m: (bool, (bool, String)),
-    n: [u8; 4],
+    l: (bool, (bool, String)),
+    m: [u8; 4],
     #[convert(bool[0])]
-    l: ExampleConvert,
+    n: ExampleConvert,
     #[length(Var<u32>)]
     #[convert(bool[1], bool[2])]
     o: (String, ExampleConvert, Vec<ExampleConvert>),
+
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -69,9 +70,9 @@ fn macros() {
         i: vec![vec![1, 2, 3], vec![4, 5, 6]],
         j: (123, true),
         k: (vec![1, 2, 3], 1000),
-        m: (true, (false, "world".to_string())),
-        n: [1, 2, 3, 4],
-        l: true,
+        l: (true, (false, "world".to_string())),
+        m: [1, 2, 3, 4],
+        n: true,
         o: ("world".to_string(), false, vec![true, false]),
     };
 
