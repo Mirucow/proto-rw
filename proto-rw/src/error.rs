@@ -14,6 +14,8 @@ impl ProtoRwError {
     }
 }
 
+impl std::error::Error for ProtoRwError {}
+
 impl From<std::io::Error> for ProtoRwError {
     fn from(e: std::io::Error) -> Self {
         ProtoRwError::IoError(e)
