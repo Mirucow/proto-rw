@@ -1,7 +1,9 @@
 use crate::{error::ProtoRwError, PRead, PWrite, ProtoRw};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct LE<T>(pub T);
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct BE<T>(pub T);
 
 impl ProtoRw for u8 {
