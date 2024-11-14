@@ -187,7 +187,8 @@ fn handle_array_type(
             }
         },
         quote! {
-            for value in #value.iter() {
+            for i in 0..#len {
+                let value = #value[i];
                 { #inner_write };
             }
         },

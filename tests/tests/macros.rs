@@ -29,6 +29,8 @@ struct ExampleStruct {
     #[length(Var<u32>)]
     #[convert(bool[1], bool[2])]
     o: (String, ExampleConvert, Vec<ExampleConvert>),
+    #[convert(bool[0])]
+    p: [ExampleConvert; 3],
 
 }
 
@@ -74,6 +76,7 @@ fn macros() {
         m: [1, 2, 3, 4],
         n: true,
         o: ("world".to_string(), false, vec![true, false]),
+        p: [true, false, true],
     };
 
     let mut buf = Vec::new();
