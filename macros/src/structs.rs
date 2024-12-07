@@ -85,8 +85,9 @@ fn handle_unnamed_fields(
 
         let ty = &f.ty;
         let (new_field, read_func, write_func) = build_type_quotes(ty, &mut props, None);
+        let field_vis = &f.vis;
 
-        new_fields.push(quote! { #new_field, });
+        new_fields.push(quote! { #field_vis #new_field, });
         read_funcs.push(quote! { #index: #read_func, });
         write_funcs.push(quote! {
             let value = self.#index.clone();
