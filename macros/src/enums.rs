@@ -28,7 +28,7 @@ pub fn build_enum(
     let (read_value_func, write_value_func) = match seg_ident.to_string().as_str() {
         "u8" => (
             quote! { buf.read_proto::<u8>()? },
-            quote! { buf.write_proto(value as u8)? },
+            quote! { (value as u8).write(buf)?; },
         ),
         "LE" | "BE" | "Var" => {
             let gen_type = extract_generic_type(&segment)
@@ -168,7 +168,7 @@ fn handle_unnamed_fields(
         quote! { #value => Self::#ident(#(#read_funcs)*), },
         quote! { Self::#ident (#(#indices),*) => {
                 let value = #value;
-                #write_value_func
+                #write_value_func;
                 #(#write_funcs)*
             }
         }
@@ -185,7 +185,7 @@ fn handle_unit(
         quote! { #value => Self::#ident, },
         quote! { Self::#ident => {
                 let value = #value;
-                #write_value_func
+                #write_value_func;
             }
         }
     )
