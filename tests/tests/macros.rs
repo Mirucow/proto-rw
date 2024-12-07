@@ -31,6 +31,7 @@ struct ExampleStruct {
     o: (String, ExampleConvert, Vec<ExampleConvert>),
     #[convert(bool[0])]
     p: [ExampleConvert; 3],
+    q: AdvancedEnum,
 
 }
 
@@ -58,6 +59,15 @@ impl From<bool> for ExampleConvert {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+#[proto_rw(Var<i32>)]
+enum AdvancedEnum {
+    A(u8) = 0,
+    B(LE<u16>, LE<u32>) = 1,
+    C(String) = 2,
+    D { a: u8, b: BE<u16> } = 3,
+}
+
 #[test]
 fn macros() {
     let example = ExampleStruct {
@@ -77,6 +87,7 @@ fn macros() {
         n: true,
         o: ("world".to_string(), false, vec![true, false]),
         p: [true, false, true],
+        q: AdvancedEnum::D { a: 42, b: 1000 },
     };
 
     let mut buf = Vec::new();
