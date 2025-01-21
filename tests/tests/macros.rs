@@ -1,5 +1,8 @@
-use proto_rw::{types::{Var, BE, LE}, ProtoRw};
 use macros::proto_rw;
+use proto_rw::{
+    types::{Var, BE, LE},
+    ProtoRw,
+};
 
 #[derive(Debug, Clone, PartialEq)]
 #[proto_rw]
@@ -29,7 +32,6 @@ struct ExampleStruct {
     #[convert(bool[0])]
     p: [ExampleConvert; 3],
     q: AdvancedEnum,
-
 }
 
 #[derive(Debug, Clone, PartialEq)]

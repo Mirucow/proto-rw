@@ -51,8 +51,12 @@ pub fn build_enum(
         let v_fields = &v.fields;
 
         let (new_declare, read_func, write_func) = match v_fields {
-            syn::Fields::Named(fields) => handle_named_fields(v_ident, v_value, fields, &write_value_func),
-            syn::Fields::Unnamed(fields) => handle_unnamed_fields(v_ident, v_value, fields, &write_value_func),
+            syn::Fields::Named(fields) => {
+                handle_named_fields(v_ident, v_value, fields, &write_value_func)
+            }
+            syn::Fields::Unnamed(fields) => {
+                handle_unnamed_fields(v_ident, v_value, fields, &write_value_func)
+            }
             syn::Fields::Unit => handle_unit(v_ident, v_value, &write_value_func),
         };
 
@@ -61,9 +65,8 @@ pub fn build_enum(
         write_funcs.push(write_func);
     }
 
-
     (
-        quote! { 
+        quote! {
             #vis enum #ident {
                 #(#new_variants)*
             }
@@ -110,7 +113,7 @@ fn handle_named_fields(
 
         let ty = &f.ty;
         let (new_field, read_func, write_func) = build_type_quotes(ty, &mut props, None);
-        
+
         new_fields.push(quote! { #f_ident: #new_field, });
         read_funcs.push(quote! { #f_ident: #read_func, });
         write_funcs.push(quote! {
@@ -128,7 +131,7 @@ fn handle_named_fields(
                 #write_value_func
                 #(#write_funcs)*
             }
-        }
+        },
     )
 }
 
@@ -171,7 +174,7 @@ fn handle_unnamed_fields(
                 #write_value_func;
                 #(#write_funcs)*
             }
-        }
+        },
     )
 }
 
@@ -187,6 +190,6 @@ fn handle_unit(
                 let value = #value;
                 #write_value_func;
             }
-        }
+        },
     )
 }

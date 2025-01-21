@@ -1,4 +1,7 @@
-use proto_rw::{types::{BE, LE}, ProtoRw};
+use proto_rw::{
+    types::{BE, LE},
+    ProtoRw,
+};
 
 #[test]
 fn endian_rw() {
