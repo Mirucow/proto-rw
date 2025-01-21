@@ -27,15 +27,15 @@ pub fn build_enum(
 
     let (read_value_func, write_value_func) = match seg_ident.to_string().as_str() {
         "u8" => (
-            quote! { buf.read_proto::<u8>()? },
-            quote! { (value as u8).write(buf)?; },
+            quote! { u8::read_proto(buf)? },
+            quote! { u8::write_proto(&(value as u8), buf)?; },
         ),
         "LE" | "BE" | "Var" => {
             let gen_type = extract_generic_type(&segment)
                 .unwrap_or_else(|| panic!("No generic type found for {}", seg_ident));
             (
-                quote! { buf.read_proto::<#seg_ident<#gen_type>>()?.into() },
-                quote! { #seg_ident::<#gen_type>(value).write(buf)?; },
+                quote! { #seg_ident::<#gen_type>::read_proto(buf)?.into() },
+                quote! { #seg_ident::<#gen_type>::write_proto(&(value.into()), buf)?; },
             )
         }
         _ => panic!("Enum type must be a LE, BE, Var, or u8"),

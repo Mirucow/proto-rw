@@ -1,8 +1,10 @@
-use crate::{error::ProtoRwError, PRead, PWrite, ProtoRw};
+use std::io::Cursor;
+
+use crate::{error::ProtoRwError, ProtoRw};
 
 impl ProtoRw for bool {
-    fn read<R: PRead>(buf: &mut R) -> Result<Self, ProtoRwError> {
-        let value = buf.read_proto::<u8>()?;
+    fn read_proto(buf: &mut Cursor<&mut [u8]>) -> Result<Self, ProtoRwError> {
+        let value = u8::read_proto(buf)?;
         match value {
             0 => Ok(false),
             1 => Ok(true),
@@ -13,8 +15,9 @@ impl ProtoRw for bool {
         }
     }
 
-    fn write<W: PWrite>(&self, buf: &mut W) -> Result<(), ProtoRwError> {
+    fn write_proto(&self, buf: &mut Vec<u8>) -> Result<(), ProtoRwError> {
         let value = if *self { 1 } else { 0 };
-        buf.write_proto::<u8>(&value)
+        u8::write_proto(&value, buf)?;
+        Ok(())
     }
 }

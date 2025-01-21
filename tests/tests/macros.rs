@@ -1,7 +1,4 @@
-use proto_rw::{
-    types::{Var, BE, LE},
-    PRead, PWrite,
-};
+use proto_rw::{types::{Var, BE, LE}, ProtoRw};
 use macros::proto_rw;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -91,10 +88,10 @@ fn macros() {
     };
 
     let mut buf = Vec::new();
-    buf.write_proto(&example).unwrap();
+    example.write_proto(&mut buf).unwrap();
 
-    let mut cursor = std::io::Cursor::new(&buf);
-    let read_example = cursor.read_proto::<ExampleStruct>().unwrap();
+    let mut cursor = std::io::Cursor::new(buf.as_mut_slice());
+    let read_example = ExampleStruct::read_proto(&mut cursor).unwrap();
 
     assert_eq!(example, read_example);
 }

@@ -1,4 +1,6 @@
-use crate::{error::ProtoRwError, PRead, PWrite, ProtoRw};
+use std::io::Cursor;
+
+use crate::{error::ProtoRwError, ProtoRw};
 
 pub struct Var<T>(pub T);
 
@@ -7,7 +9,7 @@ macro_rules! read_varuint {
         let mut value = 0;
         let mut shift = 0;
         loop {
-            let byte = $buf.read_proto::<u8>()?;
+            let byte = u8::read_proto($buf)?;
             value |= ((byte & 0x7F) as $ty) << shift;
             if byte & 0x80 == 0 {
                 break;
@@ -25,10 +27,10 @@ macro_rules! write_varuint {
             let byte = (value & 0x7F) as u8;
             value >>= 7;
             if value == 0 {
-                $buf.write_proto(&byte)?;
+                u8::write_proto(&byte, $buf)?;
                 break;
             }
-            $buf.write_proto(&(byte | 0x80))?;
+            u8::write_proto(&(byte | 0x80), $buf)?;
         }
     }};
 }
@@ -51,11 +53,11 @@ macro_rules! write_varint {
 macro_rules! impl_varuint {
     ($ty:ty) => {
         impl ProtoRw for Var<$ty> {
-            fn read<R: std::io::Read>(buf: &mut R) -> Result<Self, ProtoRwError> {
+            fn read_proto(buf: &mut Cursor<&mut [u8]>) -> Result<Self, ProtoRwError> {
                 Ok(Var(read_varuint!(buf, $ty)))
             }
 
-            fn write<W: std::io::Write>(&self, buf: &mut W) -> Result<(), ProtoRwError> {
+            fn write_proto(&self, buf: &mut Vec<u8>) -> Result<(), ProtoRwError> {
                 write_varuint!(buf, self.0);
                 Ok(())
             }
@@ -78,11 +80,11 @@ macro_rules! impl_varuint {
 macro_rules! impl_varint {
     ($ty:ty) => {
         impl ProtoRw for Var<$ty> {
-            fn read<R: std::io::Read>(buf: &mut R) -> Result<Self, ProtoRwError> {
+            fn read_proto(buf: &mut Cursor<&mut [u8]>) -> Result<Self, ProtoRwError> {
                 Ok(Var(read_varint!(buf, $ty)))
             }
 
-            fn write<W: std::io::Write>(&self, buf: &mut W) -> Result<(), ProtoRwError> {
+            fn write_proto(&self, buf: &mut Vec<u8>) -> Result<(), ProtoRwError> {
                 write_varint!(buf, $ty, self.0);
                 Ok(())
             }

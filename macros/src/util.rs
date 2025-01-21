@@ -53,8 +53,8 @@ fn handle_numeric_type(
 
     (
         quote! { #gen_type },
-        quote! { buf.read_proto::<#ident<#gen_type>>()?.into() },
-        quote! { #ident::<#gen_type>::from(#value).write(buf)? },
+        quote! { #ident::<#gen_type>::read_proto(buf)?.into() },
+        quote! { #ident::<#gen_type>::write_proto(&(#value.into()), buf)? },
     )
 }
 
@@ -73,7 +73,7 @@ fn handle_vec_type(
     (
         quote! { Vec<#inner_type> },
         quote! {
-            let len: #length_gen_type = buf.read_proto::<#length_ident<#length_gen_type>>()?.into();
+            let len = #length_ident::<#length_gen_type>::read_proto(buf)?.0;
             let mut vec = Vec::with_capacity(len as usize);
             for _ in 0..len {
                 vec.push({ #inner_read });
@@ -82,7 +82,7 @@ fn handle_vec_type(
         },
         quote! {
             let len = #value.len() as #length_gen_type;
-            #length_ident::<#length_gen_type>(len).write(buf)?;
+            #length_ident(len).write_proto(buf)?;
             for value in #value {
                 { #inner_write }
             }
@@ -99,16 +99,16 @@ fn handle_default_type(
         if let Some(convert_type) = convert_type {
             return (
                 quote! { #convert_type },
-                quote! { buf.read_proto::<#ty>()?.into() },
-                quote! { #ty::from(#value).write(buf)? },
+                quote! { #ty::read_proto(buf)?.into() },
+                quote! { #ty::write_proto(&(#value.into()), buf)? },
             );
         }
     }
 
     (
         quote! { #ty },
-        quote! { buf.read_proto::<#ty>()? },
-        quote! { #value.write(buf)? },
+        quote! { #ty::read_proto(buf)? },
+        quote! { #ty::write_proto(&#value, buf)? },
     )
 }
 

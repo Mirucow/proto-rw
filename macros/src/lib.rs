@@ -27,11 +27,11 @@ pub fn proto_rw(attr: TokenStream, item: TokenStream) -> TokenStream {
         #new_declare
 
         impl #impl_generics proto_rw::ProtoRw for #ident #type_generics #where_clause {
-            fn read<R: proto_rw::PRead>(buf: &mut R) -> Result<Self, proto_rw::error::ProtoRwError> {
+            fn read_proto(buf: &mut std::io::Cursor<&mut [u8]>) -> Result<Self, proto_rw::error::ProtoRwError> {
                 Ok(#read_funcs)
             }
 
-            fn write<W: proto_rw::PWrite>(&self, buf: &mut W) -> Result<(), proto_rw::error::ProtoRwError> {
+            fn write_proto(&self, buf: &mut Vec<u8>) -> Result<(), proto_rw::error::ProtoRwError> {
                 #write_funcs
                 Ok(())
             }

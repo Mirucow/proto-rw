@@ -1,19 +1,21 @@
-use crate::{error::ProtoRwError, PRead, PWrite, ProtoRw};
+use std::io::{Cursor, Read, Write};
+
+use crate::{error::ProtoRwError, ProtoRw};
 
 use super::var::Var;
 
 impl ProtoRw for String {
-    fn read<R: PRead>(buf: &mut R) -> Result<Self, ProtoRwError> {
-        let len: u32 = buf.read_proto::<Var<u32>>()?.into();
+    fn read_proto(buf: &mut Cursor<&mut [u8]>) -> Result<Self, ProtoRwError> {
+        let len = Var::<u32>::read_proto(buf)?.0;
         let mut data = vec![0; len as usize];
         buf.read_exact(&mut data)?;
         Ok(String::from_utf8(data)?)
     }
 
-    fn write<W: PWrite>(&self, buf: &mut W) -> Result<(), ProtoRwError> {
+    fn write_proto(&self, buf: &mut Vec<u8>) -> Result<(), ProtoRwError> {
         let data = self.as_bytes();
-        let len = Var(data.len() as u32);
-        buf.write_proto(&len)?;
+        let len = data.len() as u32;
+        Var(len).write_proto(buf)?;
         buf.write_all(data)?;
         Ok(())
     }
