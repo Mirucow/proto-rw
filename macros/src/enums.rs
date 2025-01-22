@@ -34,8 +34,8 @@ pub fn build_enum(
             let gen_type = extract_generic_type(&segment)
                 .unwrap_or_else(|| panic!("No generic type found for {}", seg_ident));
             (
-                quote! { #seg_ident::<#gen_type>::read_proto(buf)?.into() },
-                quote! { #seg_ident::<#gen_type>::write_proto(&(value.into()), buf)?; },
+                quote! { #seg_ident::<#gen_type>::read_proto(buf)?.0 },
+                quote! { #seg_ident::<#gen_type>(value).write_proto(buf)?; },
             )
         }
         _ => panic!("Enum type must be a LE, BE, Var, or u8"),
@@ -117,7 +117,7 @@ fn handle_named_fields(
         new_fields.push(quote! { #f_ident: #new_field, });
         read_funcs.push(quote! { #f_ident: #read_func, });
         write_funcs.push(quote! {
-            let value = #f_ident.clone();
+            let value = #f_ident;
             #write_func;
         });
         idents.push(f_ident);
@@ -160,7 +160,7 @@ fn handle_unnamed_fields(
         new_fields.push(quote! { #new_field, });
         read_funcs.push(quote! { #read_func, });
         write_funcs.push(quote! {
-            let value = #f_index.clone();
+            let value = #f_index;
             #write_func;
         });
         indices.push(f_index);

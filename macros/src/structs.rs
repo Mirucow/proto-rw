@@ -50,7 +50,7 @@ fn handle_named_fields(
             #field_ident: { #read_func },
         });
         write_funcs.push(quote! {
-            let value = self.#field_ident.clone();
+            let value = &self.#field_ident;
             { #write_func; };
         });
     }
@@ -90,7 +90,7 @@ fn handle_unnamed_fields(
         new_fields.push(quote! { #field_vis #new_field, });
         read_funcs.push(quote! { #index: #read_func, });
         write_funcs.push(quote! {
-            let value = self.#index.clone();
+            let value = &self.#index;
             #write_func;
         });
     }
