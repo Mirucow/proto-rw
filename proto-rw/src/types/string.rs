@@ -7,6 +7,11 @@ use super::var::Var;
 impl ProtoRw for String {
     fn read_proto(buf: &mut Bytes) -> Result<Self, ProtoRwError> {
         let len = Var::<u32>::read_proto(buf)?.0;
+
+        if buf.remaining() < len as usize {
+            return Err(ProtoRwError::UnexpectedEof);
+        }
+        
         let mut data = vec![0; len as usize];
         buf.copy_to_slice(&mut data);
         Ok(String::from_utf8(data)?)

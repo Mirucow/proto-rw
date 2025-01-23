@@ -1,6 +1,7 @@
 pub enum ProtoRwError {
     IoError(std::io::Error),
     FromUtf8Error(std::string::FromUtf8Error),
+    UnexpectedEof,
     Error(String),
 }
 
@@ -9,6 +10,7 @@ impl ProtoRwError {
         match self {
             ProtoRwError::IoError(e) => format!("Io error: {}", e),
             ProtoRwError::FromUtf8Error(e) => format!("FromUtf8 error: {}", e),
+            ProtoRwError::UnexpectedEof => "Unexpected EOF".to_string(),
             ProtoRwError::Error(e) => format!("{}", e),
         }
     }

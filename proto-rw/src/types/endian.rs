@@ -34,6 +34,10 @@ macro_rules! impl_endian {
     ($ty:ty) => {
         impl ProtoRw for LE<$ty> {
             fn read_proto(buf: &mut Bytes) -> Result<Self, ProtoRwError> {
+                if buf.remaining() < std::mem::size_of::<$ty>() {
+                    return Err(ProtoRwError::UnexpectedEof);
+                }
+
                 let mut data = [0; std::mem::size_of::<$ty>()];
                 buf.copy_to_slice(&mut data);
                 Ok(LE(<$ty>::from_le_bytes(data)))
@@ -47,6 +51,10 @@ macro_rules! impl_endian {
 
         impl ProtoRw for BE<$ty> {
             fn read_proto(buf: &mut Bytes) -> Result<Self, ProtoRwError> {
+                if buf.remaining() < std::mem::size_of::<$ty>() {
+                    return Err(ProtoRwError::UnexpectedEof);
+                }
+                
                 let mut data = [0; std::mem::size_of::<$ty>()];
                 buf.copy_to_slice(&mut data);
                 Ok(BE(<$ty>::from_be_bytes(data)))
