@@ -1,4 +1,4 @@
-use std::io::Cursor;
+use bytes::{Bytes, BytesMut};
 
 use crate::{error::ProtoRwError, ProtoRw};
 
@@ -53,11 +53,11 @@ macro_rules! write_varint {
 macro_rules! impl_varuint {
     ($ty:ty) => {
         impl ProtoRw for Var<$ty> {
-            fn read_proto(buf: &mut Cursor<&mut [u8]>) -> Result<Self, ProtoRwError> {
+            fn read_proto(buf: &mut Bytes) -> Result<Self, ProtoRwError> {
                 Ok(Var(read_varuint!(buf, $ty)))
             }
 
-            fn write_proto(&self, buf: &mut Vec<u8>) -> Result<(), ProtoRwError> {
+            fn write_proto(&self, buf: &mut BytesMut) -> Result<(), ProtoRwError> {
                 write_varuint!(buf, self.0);
                 Ok(())
             }
@@ -80,11 +80,11 @@ macro_rules! impl_varuint {
 macro_rules! impl_varint {
     ($ty:ty) => {
         impl ProtoRw for Var<$ty> {
-            fn read_proto(buf: &mut Cursor<&mut [u8]>) -> Result<Self, ProtoRwError> {
+            fn read_proto(buf: &mut Bytes) -> Result<Self, ProtoRwError> {
                 Ok(Var(read_varint!(buf, $ty)))
             }
 
-            fn write_proto(&self, buf: &mut Vec<u8>) -> Result<(), ProtoRwError> {
+            fn write_proto(&self, buf: &mut BytesMut) -> Result<(), ProtoRwError> {
                 write_varint!(buf, $ty, self.0);
                 Ok(())
             }

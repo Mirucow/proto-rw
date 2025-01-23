@@ -1,4 +1,4 @@
-use std::io::{Cursor, Read, Write};
+use bytes::{Buf, BufMut, Bytes, BytesMut};
 
 use crate::{error::ProtoRwError, ProtoRw};
 
@@ -9,27 +9,23 @@ pub struct LE<T>(pub T);
 pub struct BE<T>(pub T);
 
 impl ProtoRw for u8 {
-    fn read_proto(buf: &mut Cursor<&mut [u8]>) -> Result<Self, ProtoRwError> {
-        let mut data = [0; 1];
-        buf.read_exact(&mut data)?;
-        Ok(data[0])
+    fn read_proto(buf: &mut Bytes) -> Result<Self, ProtoRwError> {
+        Ok(buf.get_u8())
     }
 
-    fn write_proto(&self, buf: &mut Vec<u8>) -> Result<(), ProtoRwError> {
-        buf.write_all(&[*self])?;
+    fn write_proto(&self, buf: &mut BytesMut) -> Result<(), ProtoRwError> {
+        buf.put_u8(*self);
         Ok(())
     }
 }
 
 impl ProtoRw for i8 {
-    fn read_proto(buf: &mut Cursor<&mut [u8]>) -> Result<Self, ProtoRwError> {
-        let mut data = [0; 1];
-        buf.read_exact(&mut data)?;
-        Ok(data[0] as i8)
+    fn read_proto(buf: &mut Bytes) -> Result<Self, ProtoRwError> {
+        Ok(buf.get_i8())
     }
 
-    fn write_proto(&self, buf: &mut Vec<u8>) -> Result<(), ProtoRwError> {
-        buf.write_all(&[*self as u8])?;
+    fn write_proto(&self, buf: &mut BytesMut) -> Result<(), ProtoRwError> {
+        buf.put_i8(*self);
         Ok(())
     }
 }
@@ -37,27 +33,27 @@ impl ProtoRw for i8 {
 macro_rules! impl_endian {
     ($ty:ty) => {
         impl ProtoRw for LE<$ty> {
-            fn read_proto(buf: &mut Cursor<&mut [u8]>) -> Result<Self, ProtoRwError> {
+            fn read_proto(buf: &mut Bytes) -> Result<Self, ProtoRwError> {
                 let mut data = [0; std::mem::size_of::<$ty>()];
-                buf.read_exact(&mut data)?;
+                buf.copy_to_slice(&mut data);
                 Ok(LE(<$ty>::from_le_bytes(data)))
             }
 
-            fn write_proto(&self, buf: &mut Vec<u8>) -> Result<(), ProtoRwError> {
-                buf.write_all(&self.0.to_le_bytes())?;
+            fn write_proto(&self, buf: &mut BytesMut) -> Result<(), ProtoRwError> {
+                buf.extend_from_slice(&self.0.to_le_bytes());
                 Ok(())
             }
         }
 
         impl ProtoRw for BE<$ty> {
-            fn read_proto(buf: &mut Cursor<&mut [u8]>) -> Result<Self, ProtoRwError> {
+            fn read_proto(buf: &mut Bytes) -> Result<Self, ProtoRwError> {
                 let mut data = [0; std::mem::size_of::<$ty>()];
-                buf.read_exact(&mut data)?;
+                buf.copy_to_slice(&mut data);
                 Ok(BE(<$ty>::from_be_bytes(data)))
             }
 
-            fn write_proto(&self, buf: &mut Vec<u8>) -> Result<(), ProtoRwError> {
-                buf.write_all(&self.0.to_be_bytes())?;
+            fn write_proto(&self, buf: &mut BytesMut) -> Result<(), ProtoRwError> {
+                buf.extend_from_slice(&self.0.to_be_bytes());
                 Ok(())
             }
         }

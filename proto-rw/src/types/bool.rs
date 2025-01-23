@@ -1,9 +1,9 @@
-use std::io::Cursor;
+use bytes::{Bytes, BytesMut};
 
 use crate::{error::ProtoRwError, ProtoRw};
 
 impl ProtoRw for bool {
-    fn read_proto(buf: &mut Cursor<&mut [u8]>) -> Result<Self, ProtoRwError> {
+    fn read_proto(buf: &mut Bytes) -> Result<Self, ProtoRwError> {
         let value = u8::read_proto(buf)?;
         match value {
             0 => Ok(false),
@@ -15,7 +15,7 @@ impl ProtoRw for bool {
         }
     }
 
-    fn write_proto(&self, buf: &mut Vec<u8>) -> Result<(), ProtoRwError> {
+    fn write_proto(&self, buf: &mut BytesMut) -> Result<(), ProtoRwError> {
         let value = if *self { 1 } else { 0 };
         u8::write_proto(&value, buf)?;
         Ok(())

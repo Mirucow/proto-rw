@@ -1,3 +1,4 @@
+use bytes::BytesMut;
 use macros::proto_rw;
 use proto_rw::{
     types::{Var, BE, LE},
@@ -89,11 +90,11 @@ fn macros() {
         q: AdvancedEnum::D { a: 42, b: 1000 },
     };
 
-    let mut buf = Vec::new();
+    let mut buf = BytesMut::new();
     example.write_proto(&mut buf).unwrap();
 
-    let mut cursor = std::io::Cursor::new(buf.as_mut_slice());
-    let read_example = ExampleStruct::read_proto(&mut cursor).unwrap();
+    let mut buf = buf.freeze();
+    let example2 = ExampleStruct::read_proto(&mut buf).unwrap();
 
-    assert_eq!(example, read_example);
+    assert_eq!(example, example2);
 }

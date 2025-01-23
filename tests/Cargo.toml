@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 proto-rw = { path = "../proto-rw" }
 macros = { path = "../macros" }
+bytes = "1.9.0"
