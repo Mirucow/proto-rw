@@ -100,7 +100,7 @@ fn handle_default_type(
             return (
                 quote! { #convert_type },
                 quote! { #ty::read_proto(buf)?.into() },
-                quote! { #ty::from(*#value).write_proto(buf)? },
+                quote! { #ty::from(#value.clone()).write_proto(buf)? },
             );
         }
     }
